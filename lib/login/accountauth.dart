@@ -20,6 +20,8 @@ class _UserDetailsState extends State<UserDetails> {
 
   TextEditingController _managername = TextEditingController();
 
+  bool progress = false;
+
   File _image;
   final picker = ImagePicker();
 
@@ -46,7 +48,9 @@ class _UserDetailsState extends State<UserDetails> {
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
     setState(() {
       print("Profile Picture Updated");
+      progress = false;
       Navigator.of(context).popAndPushNamed('/seventh');
+
     });
   }
 
@@ -104,9 +108,17 @@ class _UserDetailsState extends State<UserDetails> {
                   ),
                   autofocus: true,
                 ),
-                RaisedButton(
+                progress ? CircularProgressIndicator(
+                  strokeWidth: 2,
+                  backgroundColor: Colors.cyanAccent,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                )
+                : ElevatedButton(
                   onPressed: () async{
                     uploadDetails(context);
+                    setState(() {
+                      progress = true;
+                    });
                   },
                   child: Text('Proceed'),
                 ),

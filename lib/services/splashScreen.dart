@@ -24,7 +24,7 @@ Future<Widget> loadFromFuture() async {
       //navigateAfterSeconds: LoginPage(),
       navigateAfterFuture: loadFromFuture(),
       title: Text(
-        'E- FeeD 🍗',
+        'Eatz  🍗',
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40.0, color: Colors.white),
       ),
       gradientBackground: LinearGradient(

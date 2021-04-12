@@ -20,7 +20,7 @@ class LoadingApp extends StatelessWidget {
                   RotatedBox(
                       quarterTurns: -1,
                       child: Text(
-                        'E - FEED',
+                        'Eatz',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 46,

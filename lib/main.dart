@@ -3,38 +3,36 @@ import 'package:flutter_manager/initializefirebase/initfailed.dart';
 import 'package:flutter_manager/initializefirebase/initloading.dart';
 import 'package:flutter_manager/login/accountauth.dart';
 import 'package:flutter_manager/login/phoneauth.dart';
-import 'package:flutter_manager/profile/settings.dart';
 import 'package:flutter_manager/screens/dataDelete.dart';
 import 'package:flutter_manager/screens/dataEdit.dart';
 import 'package:flutter_manager/screens/dataRetrieve.dart';
+import 'package:flutter_manager/screens/dataTable.dart';
 import 'package:flutter_manager/screens/dataUpload.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_manager/screens/dialogUpload.dart';
 import 'package:flutter_manager/services/FirebaseMessagingDemo.dart';
+import 'package:flutter_manager/services/analysis.dart';
 import 'package:flutter_manager/services/authservice.dart';
+import 'package:flutter_manager/services/dialog.dart';
 import 'package:flutter_manager/services/loadingapp.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter_manager/services/splashScreen.dart';
+import 'package:flutter/services.dart';
+import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 
-void main() => runApp(MyApp());
 
+void main() => runApp(EasyDynamicThemeWidget(child: MyApp()));
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
   @override
   Widget build(BuildContext context) {
-    return DynamicTheme(
-      defaultBrightness: Brightness.light,
-      data: (brightness) => new ThemeData(
-        primarySwatch: Colors.grey,
-        buttonColor: Colors.grey,
-        brightness: brightness,
-      ),
-      themedWidgetBuilder: (context, theme) {
+
         return MaterialApp(
-          title: 'Flutter Demo',
-          //theme: ThemeData.dark(),
-          theme: theme,
+          title: 'Eatz Manager',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: EasyDynamicTheme.of(context).themeMode,
           debugShowCheckedModeBanner: false,
           initialRoute: '/',
           routes: {
@@ -46,7 +44,10 @@ class MyApp extends StatelessWidget {
             '/fourth': (context) => ProfileDelete(),
             '/fifth': (context) => ProfileExisting(),
             '/sixth': (context) => UserDetails(),
-            '/seventh': (context) => UserProfile(),
+            '/seventh': (context) => Analysis(),
+            '/eighth': (context) => InfoTable(),
+
+
 
           },
           home:  FutureBuilder(
@@ -54,12 +55,13 @@ class MyApp extends StatelessWidget {
               future: Firebase.initializeApp(),
               builder: (context, snapshot) {
                 //check for errors
-                if(snapshot.hasError) {
+                if(snapshot.hasError) { 
                   return SomethingWentWrong();
                 }
                 //once complete show my application
                 if(snapshot.connectionState == ConnectionState.done) {
                   //return AuthService().handleAuth();
+                  //return UploadDialogBox();
                   return SplashApp();
 
                 }
@@ -69,8 +71,6 @@ class MyApp extends StatelessWidget {
 
           ),
         );
-      },
-    );
 
   }
 }

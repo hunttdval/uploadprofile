@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Center(
                                 child: Text(
-                                  'Welcome to e-feed Your meals the smart way 🍗',
+                                  'Welcome to Eatz Your meals the smart way 🍗',
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: Colors.white38,
@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.only(left: 25.0, right: 25.0),
                     child: TextFormField(
                       focusNode: _phoneFocusNode,
-                      //autofocus: true,
+                      autofocus: true,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
                         border: InputBorder.none,

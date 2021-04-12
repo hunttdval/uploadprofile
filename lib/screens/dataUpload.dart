@@ -6,6 +6,7 @@ import 'package:path/path.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 import 'dart:async';
+import 'dart:math';
 
 
 
@@ -26,6 +27,9 @@ class _ProfileCreateState extends State<ProfileCreate> {
 
   ///instance of firestore
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  // get permissions
+
   ///Image picker upload and url retrieve
   File _image;
   final picker = ImagePicker();
@@ -51,9 +55,12 @@ class _ProfileCreateState extends State<ProfileCreate> {
 
     ///upload image url along with other data
     //await firestore.collection('items').add({'url': '$downloadUrl'});
-    await firestore.collection('items')
+    await firestore
+        .collection('inst')
+        .doc('mustOne')
+        .collection('items')
         .doc(_controller.text)
-        .set({'name': _controller.text, 'price': int.parse(_controller2.text), 'quantity': int.parse(_controller3.text), 'url': '$downloadUrl'});
+        .set({'colorVal': colorVal,'name': _controller.text, 'price': int.parse(_controller2.text), 'quantity': int.parse(_controller3.text), 'url': '$downloadUrl'});
 
 
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
@@ -103,12 +110,32 @@ class _ProfileCreateState extends State<ProfileCreate> {
     super.dispose();
   }
 
+  /// Random Color Value
+  ///
+
+  Random rnd = new Random();
+  var lst = [
+    '0xffa9a3b2', '0xffa9a9a9', '0xffc7b02f', '0xff990099', '0xff009900', '0xff000743', '0xffbc0033', '0xff005e64', '0xff4e4e4e',
+    '0xff3e3e3e', '0xffcc033', '0xff7e0008', '0xff00bc89', '0xfffb5261', '0xff007009', '0xff0068d2', '0xff8b4f00', '0xff466700'
+  ];
+
+  void main() {
+    var element = lst[rnd.nextInt(lst.length)];
+    //print(element);
+     colorVal = element;
+    //print(colorVal);
+
+  }
+  String colorVal;
+
+  //end of random colors
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Shoe'),
+        title: Text('Add Meal'),
        // backgroundColor: Colors.red,
       ),
       body: ListView(
@@ -149,10 +176,12 @@ class _ProfileCreateState extends State<ProfileCreate> {
                           Padding(
                             padding: EdgeInsets.only(top: 60),
                             child: IconButton(
+                              //color: colors[index],
                                 icon: Icon(Icons.camera_enhance,
                                   size: 30,
                                 ),
-                                onPressed: () {
+                                onPressed: () async{
+                                  main();
                                   getImage();
                                 }
                             ),
@@ -162,7 +191,7 @@ class _ProfileCreateState extends State<ProfileCreate> {
                       SizedBox(height: 20,),
                       TextFormField(
                         decoration: InputDecoration(
-                          hintText: 'Name of Shoe:',
+                          hintText: 'Name of Meal:',
                           labelText:'Name:',
                           errorText: _validateName ? 'Please input a valid name' : null,
                         ),
@@ -174,7 +203,7 @@ class _ProfileCreateState extends State<ProfileCreate> {
                       TextFormField(
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                            hintText: 'Price of Shoe:',
+                            hintText: 'Price of Meal:',
                             labelText: 'Price:',
                           errorText: _validatePrice ? 'Please input the Price' : null,
 
@@ -201,7 +230,7 @@ class _ProfileCreateState extends State<ProfileCreate> {
                         backgroundColor: Colors.cyanAccent,
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
                       )
-                          :  RaisedButton(
+                          :  ElevatedButton(
                         //color: Colors.redAccent,
                         child: Text('Submit'),
                         onPressed: () async {
