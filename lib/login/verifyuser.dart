@@ -4,10 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_manager/initializefirebase/initloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-///TODO:set phone auth as phnNumber, confirm its working in the place of hardcoded phone number in the db query
-///TODO:make sure to verify the shared preference from phone auth is working by saving PhoneNo to phoneKey then return phoneValue and access it at the db query as value
-///TODO:confirm password change works just fine from the manager settings page
 
 class VerifyUser extends StatefulWidget {
    @override
@@ -31,7 +29,136 @@ class _VerifyUserState extends State<VerifyUser> {
     TextEditingController _controller = TextEditingController();
     FirebaseAuth _auth = FirebaseAuth.instance;
 
-    bool wrongPass = false;
+    Future<void> _verifyDialog() async {
+      return showDialog<void>(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Incorrect Password'),
+              content: Text('Kindly retry😢'),
+              actions: <Widget>[
+                ButtonBar(
+                  children: <Widget>[
+                    InkWell(
+                      splashColor: Colors.blue,
+                      child: FlatButton(
+                        onPressed: () async {
+                          await launch('sms:0722494071');
+                        },
+                        child: Text('Reset'),
+                        //textColor: Colors.white38,
+                        splashColor: Colors.blue,
+                      ),
+                    ),
+                    InkWell(
+                      splashColor: Colors.red,
+                      child: FlatButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Retry',
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            );
+          }
+      );
+    }
+    Future<void> _resetPasscode() async {
+      return showDialog<void>(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Passcode Reset'),
+              content: Text('You are about to send an SMS to eatz incoporation requesting for a passcode reset'),
+              actions: <Widget>[
+                ButtonBar(
+                  children: <Widget>[
+                    InkWell(
+                      splashColor: Colors.blue,
+                      child: FlatButton(
+                        onPressed: () async {
+                          await launch('sms:0722494071');
+                        },
+                        child: Text('Reset'),
+                        //textColor: Colors.white38,
+                        splashColor: Colors.blue,
+                      ),
+                    ),
+                    InkWell(
+                      splashColor: Colors.red,
+                      child: FlatButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Retry',
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            );
+          }
+      );
+    }
+    Future<void> _nullPasscode() async {
+      return showDialog<void>(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Passcode cant be Empty'),
+              content: Text('Input Passcode✍'),
+              actions: <Widget>[
+                ButtonBar(
+                  children: <Widget>[
+                    InkWell(
+                      splashColor: Colors.blue,
+                      child: FlatButton(
+                        onPressed: () async {
+                          await launch('sms:0722494071');
+                        },
+                        child: Text('Reset'),
+                        //textColor: Colors.white38,
+                        splashColor: Colors.blue,
+                      ),
+                    ),
+                    InkWell(
+                      splashColor: Colors.red,
+                      child: FlatButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Retry',
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            );
+          }
+      );
+    }
+
        // Toggles the password show status
 
     return FutureBuilder<DocumentSnapshot>(
@@ -43,26 +170,26 @@ class _VerifyUserState extends State<VerifyUser> {
           return Text("Something went wrong");
         }
 
-        if (snapshot.hasData && !snapshot.data.exists) {
+        else if (snapshot.hasData && !snapshot.data.exists) {
           return Text("Document does not exist");
         }
 
-        if (snapshot.connectionState == ConnectionState.done) {
-
+        else if (snapshot.connectionState == ConnectionState.done) {
+          bool wrongPass = false;
 
           Map<String, dynamic> data = snapshot.data.data();
           //return Text("Full Name: ${data['passCode']}");
           return Scaffold(
-            body: Form(
-              key: _formKey,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                      colors: [Colors.blueGrey, Colors.lightBlueAccent]
-                  )
-                ),
+            body: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [Colors.blueGrey, Colors.lightBlueAccent]
+                )
+              ),
+              child: Form(
+                key: _formKey,
                 child: Align(
                   alignment: Alignment.center,
                   child: Padding(
@@ -72,10 +199,11 @@ class _VerifyUserState extends State<VerifyUser> {
                         Expanded(
                           flex: 2,
                           child: TextFormField(
+                            // ignore: missing_return
                             decoration: InputDecoration(
                               //hintText: 'Name of Meal:',
                               labelText:'Passcode: ' ,
-                              errorText: wrongPass?'Incorrect... Retry':null,
+                              errorText: wrongPass ? 'Incorrect... Retry' : null,
                             ),
                             controller: _controller,
                             autofocus: false,
@@ -95,20 +223,21 @@ class _VerifyUserState extends State<VerifyUser> {
                                String value = await getPhone() ?? "";
                                await FirebaseFirestore.instance
                                    .collection('manager')
-                                   //.where('phone', isEqualTo: '+254721305762')
                                    .where('phone', isEqualTo: value)
                                    .get()
                                    .then((QuerySnapshot querySnapshot) {
-                                 if("${data['passCode']}" == _controller.text) {
+                                     if(_controller.text.isEmpty){
+                                       print('null passcode');
+                                       _nullPasscode();
+                                     }
+                                 else if("${data['passCode']}" == _controller.text) {
                                    Navigator.pushReplacementNamed(context, '/fifth');
                                    print('Good Job!!');
                                  }
                                  else if("${data['passCode']}" != _controller.text) {
                                    //Navigator.pushReplacementNamed(context, '/fifth');
                                    print('Incorrect password!');
-                                   setState(() {
-                                     wrongPass = true;
-                                   });
+                                   _verifyDialog();
                                  }
                                  else print('Error getting passcode');
                                });

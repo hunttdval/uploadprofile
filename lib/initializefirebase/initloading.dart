@@ -42,7 +42,7 @@ class LoadingApp extends StatelessWidget {
                           Center(
                             //child: Image.asset('assets/clip.png'),
                             child: Text(
-                              'Welcome to e-feed Your meals the smart way 🍗',
+                              'Welcome to Eatz Your meals the smart way 🍗',
                               style: TextStyle(
                                 fontSize: 24,
                                 color: Colors.white38,

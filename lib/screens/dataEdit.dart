@@ -76,7 +76,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                                 builder: (BuildContext context) {
                                   return EditDialogBox(
                                     title: doc.data()['name'],
-                                    btntext: 'done',
+                                    btntext: 'Update',
                                     controller: doc.data()['name'],
                                     controller2: doc.data()['price'].toString(),
                                     controller3: doc.data()['quantity'].toString(),

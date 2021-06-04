@@ -2,21 +2,28 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manager/services/authservice.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class LoginPage extends StatefulWidget {
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
 
+
   final _formKey = new GlobalKey<FormState>();
   FocusNode _phoneFocusNode = FocusNode();
   FocusNode _otpFocusNode = FocusNode();
 
   String phoneNo, verificationId, smsCode;
+
+  savePhone() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('phoneKey', phoneNo);
+  }
 
   bool codeSent = false;
 
@@ -208,6 +215,26 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+                          /*onPressed: () {
+                            try{
+                            if (_formKey.currentState.validate()) {
+                              // If the form is valid, display a Snackbar.
+                              print('Success');
+                              //TODO:backup incase shared preferences fails to work without this
+                              setState(() {
+                                //phnNumber = this.phoneNo;
+                                //Data. = this.phoneNo,
+                                codeSent = true;
+                                //codeSent ? AuthService().signInWithOTP(smsCode, verificationId):  verifyPhone(phoneNo);
+                              });
+                             codeSent ? AuthService().signInWithOTP(smsCode, verificationId):  verifyPhone(phoneNo);
+                            }
+                            //codeSent ? AuthService().signInWithOTP(smsCode, verificationId):  verifyPhone(phoneNo);
+                          }catch(e){
+                            print(e);
+                          }
+
+                          }),*/
                           onPressed: () {try{
                             if (_formKey.currentState.validate()) {
                               // If the form is valid, display a Snackbar.

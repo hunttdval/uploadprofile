@@ -19,6 +19,7 @@ class _UserDetailsState extends State<UserDetails> {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   TextEditingController _managername = TextEditingController();
+  TextEditingController _passChange = TextEditingController();
 
   bool progress = false;
 
@@ -35,23 +36,38 @@ class _UserDetailsState extends State<UserDetails> {
 
   Future uploadDetails (BuildContext context) async {
 
-    String fileName = basename(_image.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(fileName);
-    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
+    if(_image!= null){
+      String fileName = basename(_image.path);
+      StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(fileName);
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
 
-    var downloadUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
-    print('This is the Url:$downloadUrl');
-    await firestore.collection('manager')
-        .doc(_auth.currentUser.uid)
-        .update({'name': _managername.text, 'image': '$downloadUrl'});
+      var downloadUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
+      print('This is the Url:$downloadUrl');
+      await firestore.collection('manager')
+          .doc(_auth.currentUser.uid)
+          .update({'name': _managername.text, 'passCode': _passChange.text ,'image': '$downloadUrl'});
 
-    StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-    setState(() {
-      print("Profile Picture Updated");
-      progress = false;
-      Navigator.of(context).popAndPushNamed('/seventh');
+      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      setState(() {
+        print("Operation Successful");
+        progress = false;
+        Navigator.of(context).popAndPushNamed('/fifth');
 
-    });
+      });
+    } else {
+
+      print('Running Image == null');
+      await firestore.collection('manager')
+          .doc(_auth.currentUser.uid)
+          .update({'name': _managername.text, 'passCode': _passChange.text });
+
+      setState(() {
+        print("Operation Successful");
+        progress = false;
+        Navigator.of(context).popAndPushNamed('/fifth');
+
+      });
+    }
   }
 
   @override
@@ -108,6 +124,17 @@ class _UserDetailsState extends State<UserDetails> {
                   ),
                   autofocus: true,
                 ),
+                Divider(height: 10,),
+                TextField(
+                  controller: _passChange,
+                  decoration: InputDecoration(
+                    hintText: 'Enter new Database access Passcode:',
+                    labelText: 'e.g default is: 123456',
+                    suffixIcon: Icon(Icons.password),
+                  ),
+                  autofocus: true,
+                ),
+                SizedBox(height: 3,),
                 progress ? CircularProgressIndicator(
                   strokeWidth: 2,
                   backgroundColor: Colors.cyanAccent,

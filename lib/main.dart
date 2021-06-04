@@ -3,6 +3,8 @@ import 'package:flutter_manager/initializefirebase/initfailed.dart';
 import 'package:flutter_manager/initializefirebase/initloading.dart';
 import 'package:flutter_manager/login/accountauth.dart';
 import 'package:flutter_manager/login/phoneauth.dart';
+import 'package:flutter_manager/login/verifyuser.dart';
+import 'package:flutter_manager/profile/theme.dart';
 import 'package:flutter_manager/screens/dataDelete.dart';
 import 'package:flutter_manager/screens/dataEdit.dart';
 import 'package:flutter_manager/screens/dataRetrieve.dart';
@@ -20,6 +22,7 @@ import 'package:flutter/services.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 
 
+
 void main() => runApp(EasyDynamicThemeWidget(child: MyApp()));
 
 class MyApp extends StatelessWidget {
@@ -30,8 +33,10 @@ class MyApp extends StatelessWidget {
 
         return MaterialApp(
           title: 'Eatz Manager',
-          theme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
+          // theme: ThemeData.light(),
+          // darkTheme: ThemeData.dark(),
+          theme: lightThemeData,
+          darkTheme: darkThemeData,
           themeMode: EasyDynamicTheme.of(context).themeMode,
           debugShowCheckedModeBanner: false,
           initialRoute: '/',
@@ -46,9 +51,6 @@ class MyApp extends StatelessWidget {
             '/sixth': (context) => UserDetails(),
             '/seventh': (context) => Analysis(),
             '/eighth': (context) => InfoTable(),
-
-
-
           },
           home:  FutureBuilder(
             //initialize flutter fire
@@ -61,16 +63,13 @@ class MyApp extends StatelessWidget {
                 //once complete show my application
                 if(snapshot.connectionState == ConnectionState.done) {
                   //return AuthService().handleAuth();
-                  //return UploadDialogBox();
-                  return SplashApp();
-
+                  return VerifyUser();
+                  //return SplashApp();
                 }
                 //otherwise show something as we wait for initialization
                 return LoadingApp();
               }
-
           ),
         );
-
   }
 }

@@ -54,12 +54,40 @@ class _ProfileDeleteState extends State<ProfileDelete> {
                           trailing: IconButton(
                               icon: Icon(Icons.delete),
                               onPressed: () async {
+                                setState(() {
+                                  print("Image Deleted Done");
+                                  Scaffold.of(context).showSnackBar(
+                                      SnackBar(content: Text(
+                                        'Please Wait...',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      ));
+                                });
                                 if(doc.id != null){
-                                  String imageUrl = doc.data()['url'];
-                                  StorageReference storageReference = await FirebaseStorage.instance.getReferenceFromUrl(imageUrl);
-                                  print('The Ref is: ' + storageReference.path);
-                                  storageReference.delete();
+                                  await FirebaseFirestore.instance
+                                      .collection('inst')
+                                      .doc('mustOne')
+                                      .collection('items')
+                                      .where("name", isEqualTo: doc.id)
+                                      .get()
+                                      .then((res) {
+                                    res.docs.forEach((result) {
+                                      FirebaseStorage.instance
+                                          .getReferenceFromUrl(result.data()["url"])
+                                          .then((res) {
+                                        res.delete().then((res) {
+                                          print("Deleted!");
+                                        });
+                                      });
+                                    });
+                                  });
                                   print('image deleted');
+                                  await db
+                                      .collection('inst')
+                                      .doc('mustOne')
+                                      .collection('items')
+                                      .doc(doc.id)
+                                      .delete();
                                   setState(() {
                                     print("Image Deleted Done");
                                     Scaffold.of(context).showSnackBar(
@@ -70,12 +98,7 @@ class _ProfileDeleteState extends State<ProfileDelete> {
                                         ));
                                   });
                                 }
-                                await db
-                                    .collection('inst')
-                                    .doc('mustOne')
-                                    .collection('items')
-                                    .doc(doc.id)
-                                    .delete();
+
                               }
                           ),
                           dense: true,

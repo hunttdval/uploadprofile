@@ -9,7 +9,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 
 class PageViewDemo extends StatefulWidget {
   @override
@@ -33,6 +35,7 @@ class _PageViewDemoState extends State<PageViewDemo> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+
   }
 
    @override
@@ -91,7 +94,7 @@ class _ProfileExistingState extends State<ProfileExisting> {
                         Navigator.of(context).pop();
                       },
                       child: Text('Disagree'),
-                      textColor: Colors.white38,
+                      //textColor: Colors.white38,
                       splashColor: Colors.blue,
                     ),
                   ),
@@ -103,8 +106,80 @@ class _ProfileExistingState extends State<ProfileExisting> {
     );
   }
 
+  Future<void> _resetShelvesDialog() async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Warning !', style: TextStyle(color: Colors.red),),
+            content: Text('You are about to set the QUANTITY of all meals to ZERO \n\n This cannot be reversed once Agreed'),
+            actions: <Widget>[
+              ButtonBar(
+                children: <Widget>[
+                  InkWell(
+                    splashColor: Colors.red,
+                    child: FlatButton(
+                      onPressed: () async {
+                        await resetShelves(context);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        'Agree',
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    splashColor: Colors.blue,
+                    child: FlatButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('Disagree'),
+                      //textColor: Colors.white38,
+                      splashColor: Colors.blue,
+                    ),
+                  ),
+                ],
+              )
+            ],
+          );
+        }
+    );
+  }
+
+  Future resetShelves( BuildContext context) async {
+
+    await firestore
+        .collection('inst')
+        .doc('mustOne')
+        .collection('items')
+        .where("quantity", isGreaterThanOrEqualTo: 1)
+        .get()
+        .then((res) {
+      res.docs.forEach((result) {
+       firestore
+            .collection('inst')
+            .doc('mustOne')
+             .collection('items')
+             .doc(result.id)
+             .update({'quantity': 0});
+            });
+      print('total Is: ${res.size}');
+
+    });
+    print('all remaining quantity set to zero');
+  }
+
   @override
   Widget build(BuildContext context) {
+    //SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ));
 
     return Scaffold(
       /*appBar: AppBar(
@@ -387,8 +462,15 @@ class _ProfileExistingState extends State<ProfileExisting> {
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              IconButton(icon: Icon(Icons.palette_outlined), onPressed: () {}),
-                                              IconButton(icon: Icon(Icons.wb_sunny), onPressed: () {})
+                                              /*IconButton(
+                                                  icon: Icon(Icons.palette_outlined),
+                                                  onPressed: () {
+                                              }),*/
+                                              IconButton(icon: Icon(Icons.wb_sunny), onPressed: () {
+                                                setState(() {
+                                                  EasyDynamicTheme.of(context).changeTheme();
+                                                });
+                                              })
                                             ],
                                           ),
                                   ),
@@ -407,17 +489,8 @@ class _ProfileExistingState extends State<ProfileExisting> {
                         ),
                         ListTile(title: Text('Name: ${doc.data()['name']}'),leading: Icon(Icons.person),onTap: (){Navigator.pushNamed(context, '/sixth');},trailing: Icon(Icons.edit),),
                         ListTile(title: Text('Contact: ${doc.data()['phone']}'),leading: Icon(Icons.phone),),
-                        ListTile(
-                          title: Text(
-                            'Theme'
-                          ),
-                          onTap: () {
-                            setState(() {
-                              EasyDynamicTheme.of(context).changeTheme();
-                            });
-                          },
-                          leading: Icon(Icons.brightness_5),
-                        ),
+                        ListTile(title: Text('Close Shelves'),leading: Icon(Icons.remove_shopping_cart_outlined),onTap: () async { await _resetShelvesDialog();},),
+                        ListTile(title: Text('Switch Cafeteria'),leading: Icon(Icons.swap_horizontal_circle_outlined),onTap: (){/* change to another cafeteria / verify access first*/},),
                         ListTile(title: Text('Contact US'),leading: Icon(Icons.headset_mic),
                           onTap: () async {
                           Navigator.of(context).pop();
@@ -447,11 +520,20 @@ class _ProfileExistingState extends State<ProfileExisting> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 50,
+            expandedHeight: 100,
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text('Eatz Manager'),
+              title:RichText(text: TextSpan(
+                  text: 'Eatz',
+                  style: GoogleFonts.orbitron(textStyle: TextStyle(color: Colors.blue, letterSpacing: .5),fontSize: 21,fontWeight: FontWeight.w200,),
+                  children: <TextSpan>[
+                    TextSpan(text: ' Manager', style: GoogleFonts.lexendDeca( textStyle: TextStyle(color: Colors.blueAccent, fontSize: 14))
+                    )
+                  ]
+                )
+              ),
+              //title: Text('Eatz Manager'),
              /* background: Image.asset('assets/Donuts-PNG-File.png',
               fit: BoxFit.cover,
               ),*/
@@ -523,9 +605,11 @@ class _ProfileExistingState extends State<ProfileExisting> {
                                       ),
                                     ),
                                   ),
-                                  title: Text('Meal: ' + doc.data()["name"]),
-                                  subtitle: Text('Cost: ' + doc.data()["price"].toString()),
-                                  trailing: Text('Remaining: ' + doc.data()['quantity'].toString()),
+                                  title: Text('Meal: ' + doc.data()["name"], style: GoogleFonts.ruda(),),
+                                  subtitle: Text('Cost: ' + doc.data()["price"].toString(),style: GoogleFonts.mitr(),),
+                                  trailing: (doc.data()['quantity'] <= 50)
+                                      ? Text('Remaining: ' + doc.data()['quantity'].toString(),style: GoogleFonts.sawarabiMincho(textStyle: TextStyle(color: Colors.redAccent)),)
+                                      :Text('Remaining: ' + doc.data()['quantity'].toString(),style: GoogleFonts.sawarabiMincho(),),
                                   dense: true,
                                   //selected: true,
                                 );
@@ -560,11 +644,13 @@ class _ProfileExistingState extends State<ProfileExisting> {
         },
         tooltip: 'Add New Meal',
         icon: Icon(Icons.add),
-        label: Text('Add Meal'),
+        label: Text('Add Meal',style: GoogleFonts.orbitron(),),
         elevation: 2.0,
         splashColor: Color.alphaBlend(Colors.grey, Colors.red),
       ),
       bottomNavigationBar: BottomAppBar(
+        //color: Colors.transparent,
+        elevation: 10,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

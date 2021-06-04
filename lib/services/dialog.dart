@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'dart:io';
@@ -34,7 +35,8 @@ class _EditDialogBoxState extends State<EditDialogBox> {
   bool _validatePrice = false;
   bool _validateQuantity = false;
 
-  String quan, pric;
+  //String quan, pric;
+  int quan, pric;
 
 
   ///the image picker///
@@ -96,28 +98,38 @@ class _EditDialogBoxState extends State<EditDialogBox> {
           .doc('mustOne')
           .collection('items')
           .doc(widget.currentDoc)
-          .update({ 'price': int.parse(_controller2.text), 'quantity': int.parse(quan), 'url': '$downloadUrl'});
+         // .update({ 'price': int.parse(_controller2.text), 'quantity': int.parse(quan), 'url': '$downloadUrl'});
+          .update({ 'price': int.parse(_controller2.text), 'quantity': quan, 'url': '$downloadUrl'});
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       setState(() {
         progress = false;
-        Navigator.of(context).pop();
+        //Navigator.of(context).pop();
         print("Changes successful");
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Updated Successfully')));
+       // Scaffold.of(context).showSnackBar(SnackBar(content: Text('Updated Successfully')));
         Navigator.of(context).popAndPushNamed('/third');
       });
 
     } else {
-      setState(() {
+     /* setState(() {
         _start = 11;
         startTimer();
-      });
+      });*/
       print('Running Image==null upload');
       await db
           .collection('inst')
           .doc('mustOne')
           .collection('items')
           .doc(widget.currentDoc)
-          .update({ 'price': int.parse(_controller2.text), 'quantity': int.parse(quan), 'url': widget.img});
+          //.update({ 'price': int.parse(_controller2.text), 'quantity': int.parse(quan), 'url': widget.img});
+    .update({ 'price': pric, 'quantity': quan, 'url': widget.img});
+      setState(() {
+        progress = false;
+       // Navigator.of(context).pop();
+        print("Changes successful");
+        //Scaffold.of(context).showSnackBar(SnackBar(content: Text('Updated Successfully')));
+        //Navigator.of(context).popAndPushNamed('/third');
+        Navigator.of(context).pop();
+      });
     }
   }
 
@@ -127,7 +139,7 @@ class _EditDialogBoxState extends State<EditDialogBox> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Constants.padding),
       ),
-      elevation: 0,
+      elevation: 2,
       backgroundColor: Colors.transparent,
       child: contentBox(context),
     );
@@ -145,13 +157,14 @@ class _EditDialogBoxState extends State<EditDialogBox> {
               margin: EdgeInsets.only(top: Constants.avatarRadius),
               decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  color: Colors.white.withOpacity(0.6),
+                  //color: Colors.white.withOpacity(0.6),
+                 // color: Colors.white,
                   borderRadius: BorderRadius.circular(Constants.padding),
-                  boxShadow: [
+                 /* boxShadow: [
                     BoxShadow(color: Colors.black,offset: Offset(0,10),
                         blurRadius: 10
                     ),
-                  ]
+                  ]*/
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -159,7 +172,7 @@ class _EditDialogBoxState extends State<EditDialogBox> {
                 //you left here?? About to move controllers to this position from data edit
                 //
                 children: <Widget>[
-                  Text(widget.title,style: TextStyle(fontSize: 22,fontWeight: FontWeight.w600),),
+                  Text(widget.title,style: GoogleFonts.orbitron(textStyle: TextStyle(fontSize: 22,fontWeight: FontWeight.w600),)),
                   SizedBox(height: 15,),
                   //Text(widget.descriptions,style: TextStyle(fontSize: 14),textAlign: TextAlign.center,),
                   Column(
@@ -229,19 +242,20 @@ class _EditDialogBoxState extends State<EditDialogBox> {
                            // _controller2.text.isEmpty ? _validatePrice = true : _validatePrice = false;
                            // _controller3.text.isEmpty ? _validateQuantity = true : _validateQuantity = false;
 
-                            _controller2.text.isEmpty ? pric = widget.controller2 : pric = _controller2.text;
-                            _controller3.text.isEmpty ? quan = widget.controller3 : quan = _controller3.text;
+                            _controller2.text.isEmpty ? pric = int.parse(widget.controller2) : pric = int.parse(_controller2.text);
+                            _controller3.text.isEmpty ? quan = int.parse(widget.controller3) : quan =int.parse(_controller3.text);
 
                             if((_validateQuantity || _validatePrice) == false){
                               progress = true;
                               print('Loading Starts');
-                              _updateData(context);
-                              print('Updated Started');
+
                             }
                             else return null;
                           });
+                          await _updateData(context);
+                          print('Updated Started');
                         },
-                        child: Text(widget.btntext,style: TextStyle(fontSize: 18),)),
+                        child: Text(widget.btntext,style: GoogleFonts.orbitron(textStyle: TextStyle(fontSize: 18),))),
                   ),
                 ],
               ),

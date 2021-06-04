@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 import 'dart:io';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -89,12 +90,13 @@ class _UploadDialogBoxState extends State<UploadDialogBox> {
     setState(() {
       print("Profile Picture Updated");
       progress = false;
-      Scaffold.of(context).showSnackBar(
+      /*Scaffold.of(context).showSnackBar(
           SnackBar(content: Text(
             'Details Uploaded successfully',
             textAlign: TextAlign.center,
           ),
-          ));
+          ));*/
+      Navigator.of(context).pop();
     });
 
   }
@@ -140,7 +142,7 @@ class _UploadDialogBoxState extends State<UploadDialogBox> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Constants.padding),
         ),
-        elevation: 0,
+        elevation: 2,
         backgroundColor: Colors.transparent,
         child: contentBox(context),
       ),
@@ -157,18 +159,21 @@ class _UploadDialogBoxState extends State<UploadDialogBox> {
             margin: EdgeInsets.only(top: Constants.avatarRadius),
             decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
-                color: Colors.white.withOpacity(0.3),
+                //color: Colors.white.withOpacity(0.3),
+                //color: Colors.white,
                 borderRadius: BorderRadius.circular(Constants.padding),
                 boxShadow: [
-                  BoxShadow(color: Colors.black,offset: Offset(0,10),
+                 /* BoxShadow(
+                      color: Colors.white,
+                      offset: Offset(0,10),
                       blurRadius: 10
-                  ),
+                  ),*/
                 ]
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text('Add Meal Profile',style: TextStyle(fontSize: 22,fontWeight: FontWeight.w600),),
+                Text('Add Meal Profile',style: GoogleFonts.orbitron(textStyle: TextStyle(fontSize: 22,fontWeight: FontWeight.w600),)),
                 SizedBox(height: 15,),
                 Column(
                   children: [
@@ -221,7 +226,7 @@ class _UploadDialogBoxState extends State<UploadDialogBox> {
                     child: Text('Submit'),
                     onPressed: () async {
                       if(_image == null){
-                        Scaffold.of(context).showSnackBar(
+                       /* Scaffold.of(context).showSnackBar(
                             SnackBar(content: Text(
                               'Please add an Image!',
                               textAlign: TextAlign.center,
@@ -232,7 +237,9 @@ class _UploadDialogBoxState extends State<UploadDialogBox> {
                               ),
                             ),
                               backgroundColor: Colors.black45,
-                            ));
+                            ));*/
+                        print('image==null');
+
                       }
                       setState(() {
                         //progress = true;
