@@ -63,8 +63,8 @@ class MyApp extends StatelessWidget {
                 //once complete show my application
                 if(snapshot.connectionState == ConnectionState.done) {
                   //return AuthService().handleAuth();
-                  return VerifyUser();
-                  //return SplashApp();
+                  //return VerifyUser();
+                  return SplashApp();
                 }
                 //otherwise show something as we wait for initialization
                 return LoadingApp();
