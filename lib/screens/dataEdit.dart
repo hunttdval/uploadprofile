@@ -80,6 +80,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                                     controller: doc.data()['name'],
                                     controller2: doc.data()['price'].toString(),
                                     controller3: doc.data()['quantity'].toString(),
+                                    controller4:doc.data()['uploaded'][DateTime.now().toString().substring(0,10)] != null ? doc.data()['uploaded'][DateTime.now().toString().substring(0,10)].toString():'0',
                                     img: (doc.data()['url']),
                                     currentDoc: doc.id,
                                   );

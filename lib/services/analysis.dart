@@ -4,9 +4,7 @@ import 'Sales.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/services.dart';
 
-
 class Analysis extends StatefulWidget {
-
   @override
   _AnalysisState createState() {
     return _AnalysisState();
@@ -31,8 +29,9 @@ class _AnalysisState extends State<Analysis> {
       ),
     );
   }
+
   @override
-  void initState(){
+  void initState() {
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     super.initState();
     SystemChrome.setPreferredOrientations([
@@ -40,8 +39,9 @@ class _AnalysisState extends State<Analysis> {
       DeviceOrientation.landscapeLeft,
     ]);
   }
+
   @override
-  dispose(){
+  dispose() {
     SystemChrome.setEnabledSystemUIOverlays(
         [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     SystemChrome.setPreferredOrientations([
@@ -53,22 +53,26 @@ class _AnalysisState extends State<Analysis> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     // appBar: AppBar(title: Text('Charts')),
+      // appBar: AppBar(title: Text('Charts')),
       body: _buildBody(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('inst').doc('mustOne').collection('items').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('inst')
+          .doc('mustOne')
+          .collection('items')
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return LinearProgressIndicator();
         } else {
+          ///todo: what has been named in the Sales class its snapshot's are accessed here.
           List<Sales> sales = snapshot.data.docs
               .map((documentSnapshot) => Sales.fromMap(documentSnapshot.data()))
               .toList();
@@ -77,6 +81,7 @@ class _AnalysisState extends State<Analysis> {
       },
     );
   }
+
   Widget _buildChart(BuildContext context, List<Sales> saledata) {
     mydata = saledata;
     _generateData(mydata);
@@ -94,9 +99,10 @@ class _AnalysisState extends State<Analysis> {
                 height: 10.0,
               ),
               Expanded(
-                child: charts.BarChart(_seriesBarData,
+                child: charts.BarChart(
+                  _seriesBarData,
                   animate: true,
-                  animationDuration: Duration(seconds:3),
+                  animationDuration: Duration(seconds: 3),
                   behaviors: [
                     new charts.DatumLegend(
                       entryTextStyle: charts.TextStyleSpec(
@@ -113,5 +119,4 @@ class _AnalysisState extends State<Analysis> {
       ),
     );
   }
- }
-
+}

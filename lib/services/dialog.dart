@@ -14,9 +14,9 @@ import 'dart:io';
 class EditDialogBox extends StatefulWidget {
   final String title, btntext, img, currentDoc;
   //final Image img;
-  final String  controller, controller2, controller3;
+  final String  controller, controller2, controller3, controller4;
 
-  const EditDialogBox({Key key, this.title, this.controller, this.controller2, this.controller3, this.btntext, this.img, this.currentDoc}) : super(key: key);
+  const EditDialogBox({Key key, this.title, this.controller, this.controller2, this.controller3, this.controller4,this.btntext, this.img, this.currentDoc}) : super(key: key);
 
   @override
   _EditDialogBoxState createState() => _EditDialogBoxState();
@@ -71,11 +71,12 @@ class _EditDialogBoxState extends State<EditDialogBox> {
       }
     });
   }
-  @override
+ /* @override
   void dispose() {
     _timer.cancel();
     super.dispose();
-  }
+  }*/
+
   Future _updateData (BuildContext context) async {
 
     ///upload image url along with other data
@@ -92,6 +93,9 @@ class _EditDialogBoxState extends State<EditDialogBox> {
 
       var downloadUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
       print('This is the Url:$downloadUrl');
+
+      int quanParam = int.parse(widget.controller3);
+      int upParam = int.parse(widget.controller4);
       //upUrl = '$downloadUrl';
       await db
           .collection('inst')
@@ -99,7 +103,7 @@ class _EditDialogBoxState extends State<EditDialogBox> {
           .collection('items')
           .doc(widget.currentDoc)
          // .update({ 'price': int.parse(_controller2.text), 'quantity': int.parse(quan), 'url': '$downloadUrl'});
-          .update({ 'price': int.parse(_controller2.text), 'quantity': quan, 'url': '$downloadUrl'});
+          .set({ 'price': int.parse(_controller2.text), 'quantity':  quanParam+=quan, 'url': '$downloadUrl', 'uploaded':{DateTime.now().toString().substring(0,10):upParam+=quan}},SetOptions(merge:true));
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       setState(() {
         progress = false;
@@ -114,6 +118,12 @@ class _EditDialogBoxState extends State<EditDialogBox> {
         _start = 11;
         startTimer();
       });*/
+      int upParam= int.parse(widget.controller4);
+      int quanParam = int.parse(widget.controller3);
+      //widget.controller4 != null ? upParam = int.parse(widget.controller4) : upParam = 0;
+
+      //_controller2.text.isEmpty ? pric = int.parse(widget.controller2) : pric = int.parse(_controller2.text);
+      //_controller3.text.isEmpty ? quan = int.parse(widget.controller3) : quan =int.parse(_controller3.text);
       print('Running Image==null upload');
       await db
           .collection('inst')
@@ -121,7 +131,9 @@ class _EditDialogBoxState extends State<EditDialogBox> {
           .collection('items')
           .doc(widget.currentDoc)
           //.update({ 'price': int.parse(_controller2.text), 'quantity': int.parse(quan), 'url': widget.img});
-    .update({ 'price': pric, 'quantity': quan, 'url': widget.img});
+    //.update({ 'price': pric, 'quantity': quan, 'url': widget.img});
+          .set({ 'price': pric, 'quantity': quanParam+=quan, 'uploaded':{DateTime.now().toString().substring(0,10):upParam+=quan}},SetOptions(merge: true));
+      ///Todo: to monitor deducts and uploads value of Quan should be uploaded
       setState(() {
         progress = false;
        // Navigator.of(context).pop();
@@ -131,6 +143,13 @@ class _EditDialogBoxState extends State<EditDialogBox> {
         Navigator.of(context).pop();
       });
     }
+  }
+
+  Future valueAdded() async {
+    int man = 3;
+    int sum = man + int.parse(widget.controller3);
+    //int sum = man + 3;
+    print(sum);
   }
 
     @override
@@ -195,9 +214,10 @@ class _EditDialogBoxState extends State<EditDialogBox> {
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 15.0),
                         child: TextFormField(
+                          readOnly: true,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            hintText: 'New Price:',
+                            hintText: 'Price cannot be edited:',
                             labelText: 'Current Price: ' + widget.controller2,
                             errorText: _validatePrice ? 'Please input the Price' : null,
 
@@ -210,9 +230,17 @@ class _EditDialogBoxState extends State<EditDialogBox> {
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 15.0),
                         child: TextFormField(
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.phone,
+
+                          // ignore: missing_return
+                          validator: (val){
+                            int c3 = int.parse(widget.controller3);
+                            if(int.parse(val) + c3 < 0){
+                              return 'error, Value remaining cant be a negative';
+                            }
+                          },
                           decoration: InputDecoration(
-                            hintText: 'New Quantity:',
+                            hintText: 'Amount to Add(5) or Deduct(-5):',
                             labelText: 'Current Quantity: ' + widget.controller3,
                             errorText: _validateQuantity ? 'Please input the quantity available' : null,
 
@@ -253,7 +281,8 @@ class _EditDialogBoxState extends State<EditDialogBox> {
                             else return null;
                           });
                           await _updateData(context);
-                          print('Updated Started');
+                          //await valueAdded();
+                          print('Update Started');
                         },
                         child: Text(widget.btntext,style: GoogleFonts.orbitron(textStyle: TextStyle(fontSize: 18),))),
                   ),
@@ -312,3 +341,4 @@ class Constants{
   static const double padding = 20;
   static const double avatarRadius = 45;
 }
+

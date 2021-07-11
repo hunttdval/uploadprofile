@@ -13,6 +13,7 @@ class _ProfileDeleteState extends State<ProfileDelete> {
   FirebaseFirestore dbcol = FirebaseFirestore.instance;
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,50 +55,109 @@ class _ProfileDeleteState extends State<ProfileDelete> {
                           trailing: IconButton(
                               icon: Icon(Icons.delete),
                               onPressed: () async {
-                                setState(() {
-                                  print("Image Deleted Done");
-                                  Scaffold.of(context).showSnackBar(
-                                      SnackBar(content: Text(
-                                        'Please Wait...',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      ));
-                                });
-                                if(doc.id != null){
-                                  await FirebaseFirestore.instance
-                                      .collection('inst')
-                                      .doc('mustOne')
-                                      .collection('items')
-                                      .where("name", isEqualTo: doc.id)
-                                      .get()
-                                      .then((res) {
-                                    res.docs.forEach((result) {
-                                      FirebaseStorage.instance
-                                          .getReferenceFromUrl(result.data()["url"])
-                                          .then((res) {
-                                        res.delete().then((res) {
-                                          print("Deleted!");
-                                        });
-                                      });
-                                    });
-                                  });
-                                  print('image deleted');
-                                  await db
-                                      .collection('inst')
-                                      .doc('mustOne')
-                                      .collection('items')
-                                      .doc(doc.id)
-                                      .delete();
-                                  setState(() {
-                                    print("Image Deleted Done");
-                                    Scaffold.of(context).showSnackBar(
-                                        SnackBar(content: Text(
-                                          'Deletion Successful',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        ));
-                                  });
-                                }
+                                  return showDialog<void>(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('WARNING!'),
+                                          content: Text('About to delete '+doc.data()['name']),
+                                          actions: <Widget>[
+                                            ButtonBar(
+                                              children: <Widget>[
+                                                InkWell(
+                                                  splashColor: Colors.red,
+                                                  child: FlatButton(
+                                                    onPressed: () async {
+                                                     /* setState(() {
+                                                        print("Image Deleted Done");
+                                                        Scaffold.of(context).showSnackBar(
+                                                            SnackBar(content: Text(
+                                                              'Please Wait...',
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                            ));
+                                                      });*/
+                                                      if(doc.id != null){
+                                                        await FirebaseFirestore.instance
+                                                            .collection('inst')
+                                                            .doc('mustOne')
+                                                            .collection('items')
+                                                            .where("name", isEqualTo: doc.id)
+                                                            .get()
+                                                            .then((res) {
+                                                          res.docs.forEach((result) {
+                                                            FirebaseStorage.instance
+                                                                .getReferenceFromUrl(result.data()["url"])
+                                                                .then((res) {
+                                                              res.delete().then((res) {
+                                                                print("Deleted!");
+                                                              });
+                                                            });
+                                                          });
+                                                        });
+                                                        print('image deleted');
+                                                        await db
+                                                            .collection('inst')
+                                                            .doc('mustOne')
+                                                            .collection('items')
+                                                            .doc(doc.id).get().then((value) {
+                                                           db
+                                                              .collection('inst')
+                                                              .doc('mustOne').collection('deleted').doc(DateTime.now().toString().substring(0,10)).set({value.data()['name']:value.data()},SetOptions(merge: true)).then((value) {
+                                                             db
+                                                                 .collection('inst')
+                                                                 .doc('mustOne')
+                                                                 .collection('items')                  
+                                                                 .doc(doc.id)
+                                                                 .delete();
+                                                           });
+                                                        });
+
+                                                        // await db
+                                                        //     .collection('inst')
+                                                        //     .doc('mustOne')
+                                                        //     .collection('items')
+                                                        //     .doc(doc.id)
+                                                        //     .delete();
+                                                        Navigator.of(context).pop();
+
+                                                        setState(() {
+                                                          print("Image Deleted Done");
+                                                          Scaffold.of(context).showSnackBar(
+                                                              SnackBar(content: Text(
+                                                                'Deletion Successful',
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                              ));
+                                                        });
+                                                      }
+                                                    },
+                                                    child: Text(
+                                                      'Agree',
+                                                      style: TextStyle(
+                                                        color: Colors.redAccent,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                InkWell(
+                                                  splashColor: Colors.blue,
+                                                  child: FlatButton(
+                                                    onPressed: () async {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text('Disagree'),
+                                                    //textColor: Colors.white38,
+                                                    splashColor: Colors.blue,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        );
+                                      }
+                                  );
 
                               }
                           ),

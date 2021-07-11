@@ -78,12 +78,30 @@ class _UploadDialogBoxState extends State<UploadDialogBox> {
 
     ///upload image url along with other data
     //await firestore.collection('items').add({'url': '$downloadUrl'});
+    /*await firestore
+        .collection('inst')
+        .doc('mustOne')
+        .collection('items')
+        .doc(_controller.text)
+        .set({'colorVal': colorVal,'name': _controller.text, 'price': int.parse(_controller2.text), 'quantity': int.parse(_controller3.text), 'url': '$downloadUrl'});*/
+    //todo: upload values to field remaining and uploaded
     await firestore
         .collection('inst')
         .doc('mustOne')
         .collection('items')
         .doc(_controller.text)
-        .set({'colorVal': colorVal,'name': _controller.text, 'price': int.parse(_controller2.text), 'quantity': int.parse(_controller3.text), 'url': '$downloadUrl'});
+        .set({'colorVal': colorVal,
+      'name': _controller.text,
+      'price': int.parse(_controller2.text),
+      'quantity': int.parse(_controller3.text),
+      'url': '$downloadUrl',
+      'uploaded':{
+        DateTime.now().toString().substring(0,10):int.parse(_controller3.text)
+      },
+      'remaining':{
+        DateTime.now().toString().substring(0,10):int.parse(_controller3.text)
+      },
+        },SetOptions(merge: true));
 
 
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
